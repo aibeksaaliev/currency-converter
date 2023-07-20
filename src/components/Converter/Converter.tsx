@@ -38,6 +38,7 @@ const Converter = () => {
                             type="text"
                             value={usersRequest}
                             onChange={currencyInputChangeHandler}
+                            placeholder="Ex: 99 usd in kgs"
                             inputProps={{min: 0, style: { textAlign: 'center' }}}
                             />
                     </Grid>
