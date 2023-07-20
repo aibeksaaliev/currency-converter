@@ -1,16 +1,15 @@
 import {createSlice} from "@reduxjs/toolkit";
 import {getAllCurrencies, getCurrentCurrency} from "./CurrencyThunks";
 import {RootState} from "../../app/store";
-import {Rates} from "../../types";
 
 interface CurrencyState {
-    currency: Rates | null;
+    currency: string;
     base: string;
     currencies: [string, number][];
 }
 
 const initialState: CurrencyState = {
-    currency: null,
+    currency: "",
     base: "RUB",
     currencies: [],
 };
@@ -25,7 +24,7 @@ export const currencySlice = createSlice({
     },
     extraReducers: (builder) => {
         builder.addCase(getCurrentCurrency.fulfilled, (state, action) => {
-            state.currency = action.payload.rates;
+            state.currency = Object.values(action.payload.rates)[0].toFixed(2);
         });
 
         builder.addCase(getAllCurrencies.fulfilled, (state, action) => {

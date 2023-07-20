@@ -1,23 +1,23 @@
 import React, {useState} from 'react';
-import {Grid, TextField, Typography} from "@mui/material";
+import {Grid, IconButton, TextField, Typography} from "@mui/material";
 import {useAppDispatch, useAppSelector} from "../../app/hooks";
 import {getCurrentCurrency} from "../../features/Currency/CurrencyThunks";
 import {ExchangeType} from "../../types";
-import {LoadingButton} from "@mui/lab";
 import {selectCurrency} from "../../features/Currency/CurrencySlice";
+import SyncIcon from '@mui/icons-material/Sync';
 
 const Converter = () => {
     const dispatch = useAppDispatch();
     const currency = useAppSelector(selectCurrency);
     const [usersRequest, setUsersRequest] = useState("");
-    const [exchangeOptions, setExchangeOptions] = useState<ExchangeType>({
-        amount: 0,
-        base: "",
-        output: "",
-    });
 
-    const filterUsersRequest = (options: string) => {
-        const optionsToArrayOfSymbols = options.split(" ");
+    const currencyInputChangeHandler = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        await setUsersRequest(e.target.value);
+    };
+
+    const submitForm = async (e: React.FormEvent) => {
+        e.preventDefault();
+        const optionsToArrayOfSymbols = usersRequest.split(" ");
 
         const result: ExchangeType = {
             amount: Number(optionsToArrayOfSymbols[0]),
@@ -25,36 +25,33 @@ const Converter = () => {
             output: optionsToArrayOfSymbols[3].toUpperCase(),
         };
 
-        setExchangeOptions(result);
-    };
-
-    const currencyInputChangeHandler = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        await setUsersRequest(e.target.value);
-    };
-
-    const submitForm = async (e: React.FormEvent) => {
-      e.preventDefault();
-      await filterUsersRequest(usersRequest);
-      await dispatch(getCurrentCurrency(exchangeOptions));
+        await dispatch(getCurrentCurrency(result));
     };
 
     return (
-        <Grid container>
-            <Grid item xs={12}>
+        <Grid container sx={{display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center"}}>
+            <Grid item xs={4}>
                 <form onSubmit={submitForm}>
-                    <Grid item xs={12}>
-                        <TextField type="text" value={usersRequest} onChange={currencyInputChangeHandler}/>
+                    <Grid container sx={{display: "flex", flexDirection: "column", alignItems: "center"}}>
+                    <Grid item xs={9} sx={{mb:1}}>
+                        <TextField
+                            type="text"
+                            value={usersRequest}
+                            onChange={currencyInputChangeHandler}
+                            inputProps={{min: 0, style: { textAlign: 'center' }}}
+                            />
                     </Grid>
-                    <Grid item xs={12}>
-                        <LoadingButton type="submit">
-                            Convert
-                        </LoadingButton>
+                    <Grid item xs={3} sx={{mb:1}}>
+                            <IconButton type="submit" sx={{background: "#1976d2"}}>
+                                <SyncIcon/>
+                            </IconButton>
+                    </Grid>
                     </Grid>
                 </form>
             </Grid>
-            <Grid item xs={12}>
+            <Grid item xs={4}>
                 <Typography>
-                    {currency ? Object.values(currency) : ""}
+                    {currency}
                 </Typography>
             </Grid>
         </Grid>
